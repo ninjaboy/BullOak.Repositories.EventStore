@@ -9,7 +9,7 @@ Scenario Outline: Save events in a new stream
 	When I try to save the new events in the stream
 	Then the save process should succeed
 	 And there should be <eventsCount> events in the stream
-Examples: 
+Examples:
 	| eventsCount |
 	| 1           |
 	| 30          |
@@ -33,7 +33,7 @@ Scenario: Concurrent write should fail for outdated session
 	And session 'Session1' is open
 	And session 'Session2' is open
 	And 10 new events are added by 'Session1'
-	And 10 new events are added by 'Session2'	
+	And 10 new events are added by 'Session2'
 	When I try to save 'Session1'
 	And I try to save 'Session2'
 	Then the save process should succeed for 'Session1'
@@ -66,3 +66,71 @@ Scenario: Write after a soft deleted stream should succeed
 	And I load my entity
 	Then the load process should succeed
 	And HighOrder property should be 9
+
+Scenario Outline: Write after a soft delete by event for a stream should succeed
+	Given an existing stream with <eventsCount1> events
+	And I soft-delete-by-event the stream
+	And <eventsCount2> new events
+	When I try to save the new events in the stream
+	And I load my entity
+	Then the load process should succeed
+	And HighOrder property should be <highOrder>
+Examples:
+	| eventsCount1 | eventsCount2 | highOrder |
+	| 3            | 10           | 9         |
+	| 10           | 3            | 2         |
+	| 10           | 10000        | 9999      |
+	| 10000        | 10           | 9         |
+
+Scenario Outline: Write after a soft delete by event and new session opened should succeed
+	Given a new stream
+	And session 'session1' is open
+	And <eventsCount1> new events are added by 'session1'
+	When I try to save 'session1'
+	And I soft-delete-by-event the stream
+	And I open session 'session2'
+	And I try to add <eventsCount2> new events to 'session2'
+	And I try to save 'session2'
+	And I load my entity
+	Then the load process should succeed
+	And HighOrder property should be <highOrder>
+Examples:
+	| eventsCount1 | eventsCount2 | highOrder |
+	| 3            | 10           | 9         |
+	| 10           | 3            | 2         |
+	| 10           | 10000        | 9999      |
+	| 10000        | 10           | 9         |
+
+Scenario Outline: Write after a soft delete by custom event for a stream should succeed
+	Given an existing stream with <eventsCount1> events
+	And I soft-delete-by-custom-event the stream
+	And <eventsCount2> new events
+	When I try to save the new events in the stream
+	And I load my entity
+	Then the load process should succeed
+	And HighOrder property should be <highOrder>
+Examples:
+	| eventsCount1 | eventsCount2 | highOrder |
+	| 3            | 10           | 9         |
+	| 10           | 3            | 2         |
+	| 10           | 10000        | 9999      |
+	| 10000        | 10           | 9         |
+
+Scenario Outline: Write after a soft delete by custom event and new session opened should succeed
+	Given a new stream
+	And session 'session1' is open
+	And <eventsCount1> new events are added by 'session1'
+	When I try to save 'session1'
+	And I soft-delete-by-custom-event the stream
+	And I open session 'session2'
+	And I try to add <eventsCount2> new events to 'session2'
+	And I try to save 'session2'
+	And I load my entity
+	Then the load process should succeed
+	And HighOrder property should be <highOrder>
+Examples:
+	| eventsCount1 | eventsCount2 | highOrder |
+	| 3            | 10           | 9         |
+	| 10           | 3            | 2         |
+	| 10           | 10000        | 9999      |
+	| 10000        | 10           | 9         |

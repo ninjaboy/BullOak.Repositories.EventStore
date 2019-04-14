@@ -53,7 +53,7 @@
         [When(@"I try to save the new events in the stream through their interface")]
         public async Task GivenITryToSaveTheNewEventsInTheStreamThroughTheirInterface()
         {
-            testDataContext.RecordedException = await Record.ExceptionAsync(async () => 
+            testDataContext.RecordedException = await Record.ExceptionAsync(async () =>
             {
                 using (var session = await eventStoreContainer.StartSession(testDataContext.CurrentStreamId))
                 {
@@ -81,12 +81,22 @@
         }
 
         [Given(@"I soft-delete the stream")]
-        public async Task GivenISoft_DeleteTheStream()
-            => await eventStoreContainer.SoftDeleteStream(testDataContext.CurrentStreamId);
+        public Task GivenISoft_DeleteTheStream()
+            => eventStoreContainer.SoftDeleteStream(testDataContext.CurrentStreamId);
 
         [Given(@"I hard-delete the stream")]
-        public async Task GivenIHard_DeleteTheStream()
-            => await eventStoreContainer.HardDeleteStream(testDataContext.CurrentStreamId);
+        public Task GivenIHard_DeleteTheStream()
+            => eventStoreContainer.HardDeleteStream(testDataContext.CurrentStreamId);
+
+        [Given(@"I soft-delete-by-event the stream")]
+        [When(@"I soft-delete-by-event the stream")]
+        public Task GivenI_Soft_Delete_by_EventTheStream()
+            => eventStoreContainer.SoftDeleteByEvent(testDataContext.CurrentStreamId);
+
+        [Given(@"I soft-delete-by-custom-event the stream")]
+        [When(@"I soft-delete-by-custom-event the stream")]
+        public Task GivenI_Soft_Delete_by_Custom_EventTheStream()
+            => eventStoreContainer.SoftDeleteByEvent(testDataContext.CurrentStreamId, () => new MyEntitySoftDeleted());
 
         [Then(@"the load process should succeed")]
         [Then(@"the save process should succeed")]
@@ -126,6 +136,7 @@
         }
 
         [Given(@"session '(.*)' is open")]
+        [When(@"I open session '(.*)'")]
         public async Task GivenSessionIsOpen(string sessionName)
         {
             testDataContext.NamedSessions.Add(

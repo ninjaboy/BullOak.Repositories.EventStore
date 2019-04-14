@@ -25,15 +25,16 @@
         {
             checked
             {
-                int currentVersion;
+                int currentVersion = -1;
+                bool foundSoftDelete = false;
                 var events = new List<ItemWithType>();
                 StreamEventsSlice currentSlice;
-                long nextSliceStart = StreamPosition.Start;
+                long nextSliceStart = StreamPosition.End;
                 do
                 {
                     currentSlice =
-                        await eventStoreConnection.ReadStreamEventsForwardAsync(streamId, nextSliceStart, SliceSize,
-                            true);
+                        await eventStoreConnection.ReadStreamEventsBackwardAsync(streamId, nextSliceStart,
+                            SliceSize, true);
                     if (currentSlice.Status == SliceReadStatus.StreamDeleted ||
                         currentSlice.Status == SliceReadStatus.StreamNotFound)
                     {
@@ -43,10 +44,22 @@
                     }
 
                     nextSliceStart = currentSlice.NextEventNumber;
-                    events.AddRange(currentSlice.Events.Select(x=> x.ToItemWithType(stateFactory)));
-                    currentVersion = (int) currentSlice.LastEventNumber;
-                } while (!currentSlice.IsEndOfStream);
+                    var newEvents =
+                        currentSlice.Events.Select(x => x.ToItemWithType(stateFactory))
+                            .TakeWhile(@event =>
+                            {
+                                foundSoftDelete = @event.IsSoftDeleteEvent();
+                                return !foundSoftDelete;
+                            });
+                    events.AddRange(newEvents);
 
+                    if (currentVersion == -1)
+                    {
+                        currentVersion = (int)currentSlice.LastEventNumber;
+                    }
+                } while (nextSliceStart != -1 && !foundSoftDelete);
+
+                events.Reverse();
                 return new StreamReadResults(events, currentVersion);
             }
         }
