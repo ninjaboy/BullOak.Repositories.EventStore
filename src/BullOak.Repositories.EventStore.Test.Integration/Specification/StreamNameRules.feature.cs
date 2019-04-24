@@ -17,17 +17,17 @@ namespace BullOak.Repositories.EventStore.Test.Integration.Specification
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.0.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class StateRetrievalSpecsFeature : Xunit.IClassFixture<StateRetrievalSpecsFeature.FixtureData>, System.IDisposable
+    public partial class StreamNameRulesFeature : Xunit.IClassFixture<StreamNameRulesFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
-#line 1 "StateRetreivalSpecs.feature"
+#line 1 "StreamNameRules.feature"
 #line hidden
         
-        public StateRetrievalSpecsFeature(StateRetrievalSpecsFeature.FixtureData fixtureData, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public StreamNameRulesFeature(StreamNameRulesFeature.FixtureData fixtureData, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -36,9 +36,8 @@ namespace BullOak.Repositories.EventStore.Test.Integration.Specification
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "StateRetrievalSpecs", "\tIn order to implement complex logic without further state storage\n\tAs a develope" +
-                    "r using this library\n\tI want the current state to be updated immediately when I " +
-                    "add new events even if I don\'t save the session", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "StreamNameRules", "  In order to correlate entity id with the stream name\n  As a library user\n  I ex" +
+                    "pect stream names to be generated based on the id provided", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -78,25 +77,40 @@ namespace BullOak.Repositories.EventStore.Test.Integration.Specification
             this.ScenarioTearDown();
         }
         
-        [Xunit.TheoryAttribute(DisplayName="When I add new events in the stream I want the state to be updated immediately")]
-        [Xunit.TraitAttribute("FeatureTitle", "StateRetrievalSpecs")]
-        [Xunit.TraitAttribute("Description", "When I add new events in the stream I want the state to be updated immediately")]
-        [Xunit.InlineDataAttribute("0", "3", "2", new string[0])]
-        [Xunit.InlineDataAttribute("2", "3", "2", new string[0])]
-        [Xunit.InlineDataAttribute("7", "3", "6", new string[0])]
-        [Xunit.InlineDataAttribute("0", "10000", "9999", new string[0])]
-        public virtual void WhenIAddNewEventsInTheStreamIWantTheStateToBeUpdatedImmediately(string eventCount, string addedEvents, string highOrder, string[] exampleTags)
+        [Xunit.FactAttribute(DisplayName="Save events to a stream based on explicit interface")]
+        [Xunit.TraitAttribute("FeatureTitle", "StreamNameRules")]
+        [Xunit.TraitAttribute("Description", "Save events to a stream based on explicit interface")]
+        public virtual void SaveEventsToAStreamBasedOnExplicitInterface()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("When I add new events in the stream I want the state to be updated immediately", null, exampleTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Save events to a stream based on explicit interface", null, ((string[])(null)));
+#line 6
+  this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line 7
+    testRunner.Given("a new Id explicitly implementing ISerializeToStreamName", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 8
+    testRunner.When("I try to save the new events for that id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 9
+    testRunner.Then("the explicitly named event stream should exist and contain saved data", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.FactAttribute(DisplayName="Save events to a stream based on ToString")]
+        [Xunit.TraitAttribute("FeatureTitle", "StreamNameRules")]
+        [Xunit.TraitAttribute("Description", "Save events to a stream based on ToString")]
+        public virtual void SaveEventsToAStreamBasedOnToString()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Save events to a stream based on ToString", null, ((string[])(null)));
 #line 11
-this.ScenarioInitialize(scenarioInfo);
+  this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line 12
- testRunner.Given(string.Format("an existing stream with {0} events", eventCount), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+    testRunner.Given("a new Id that doesn\'t implement ISerializeToStreamName", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 13
- testRunner.When(string.Format("I add {0} events in the session without saving it", addedEvents), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    testRunner.When("I try to save the new events for that id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line 14
- testRunner.Then(string.Format("HighOrder property should be {0}", highOrder), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+    testRunner.Then("the ToString based event stream should exist and contain saved data", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
@@ -108,12 +122,12 @@ this.ScenarioInitialize(scenarioInfo);
             
             public FixtureData()
             {
-                StateRetrievalSpecsFeature.FeatureSetup();
+                StreamNameRulesFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                StateRetrievalSpecsFeature.FeatureTearDown();
+                StreamNameRulesFeature.FeatureTearDown();
             }
         }
     }

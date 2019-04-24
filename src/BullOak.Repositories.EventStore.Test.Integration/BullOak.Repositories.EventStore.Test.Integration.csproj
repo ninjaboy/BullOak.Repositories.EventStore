@@ -1,79 +1,61 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
-    <IsPackable>false</IsPackable>
-    <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-  </PropertyGroup>
+    <PropertyGroup>
+        <Configurations>Release;Debug</Configurations>
+        <TargetFramework>netcoreapp2.2</TargetFramework>
+        <IsPackable>false</IsPackable>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+        <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="BullOak.Repositories" Version="2.2.1" />
-    <PackageReference Include="FluentAssertions" Version="5.3.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-    <PackageReference Include="SpecFlow" Version="2.3.2" />
-    <PackageReference Include="SpecFlow.xUnit" Version="2.3.2" />
-    <PackageReference Include="xunit" Version="2.3.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
-    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
-    <DotNetCliToolReference Include="SpecFlow.NetCore" Version="1.3.2" />
-  </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Remove="TestResults\**" />
+        <None Remove="TestResults\**" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="BullOak.Repositories" Version="2.2.1" />
+        <PackageReference Include="FluentAssertions" Version="5.6.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="2.2.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
+        <PackageReference Include="SpecFlow" Version="3.0.191" />
+        <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.0.191" />
+        <PackageReference Include="SpecFlow.xUnit" Version="3.0.191" />
+        <PackageReference Include="xunit" Version="2.4.1" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
+        <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\BullOak.Repositories.EventStore\BullOak.Repositories.EventStore.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\BullOak.Repositories.EventStore\BullOak.Repositories.EventStore.csproj" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Specification\ReconstituteState.feature.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>ReconstituteState.feature</DependentUpon>
-    </Compile>
-    <Compile Update="Specification\SaveEventStream.feature.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>SaveEventStream.feature</DependentUpon>
-    </Compile>
-    <Compile Update="Specification\StateRetreivalSpecs.feature.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>StateRetreivalSpecs.feature</DependentUpon>
-    </Compile>
-  </ItemGroup>
+    <ItemGroup>
+        <None Update="appsettings.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
 
-  <ItemGroup>
-    <None Update="EventStoreServer\EventStore.ClusterNode.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Specification\ReconstituteState.feature">
-      <Generator>SpecFlowSingleFileGenerator</Generator>
-      <LastGenOutput>ReconstituteState.feature.cs</LastGenOutput>
-    </None>
-    <None Update="Specification\ReconstituteState.feature.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Specification\ReconstituteState.feature</DependentUpon>
-    </None>
-    <None Update="Specification\SaveEventStream.feature">
-      <Generator>SpecFlowSingleFileGenerator</Generator>
-      <LastGenOutput>SaveEventStream.feature.cs</LastGenOutput>
-    </None>
-    <None Update="Specification\SaveEventStream.feature.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>SaveEventStream.feature</DependentUpon>
-    </None>
-    <None Update="Specification\StateRetreivalSpecs.feature">
-      <Generator>SpecFlowSingleFileGenerator</Generator>
-      <LastGenOutput>StateRetreivalSpecs.feature.cs</LastGenOutput>
-    </None>
-    <None Update="Specification\StateRetreivalSpecs.feature.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>StateRetreivalSpecs.feature</DependentUpon>
-    </None>
-  </ItemGroup>
+    <ItemGroup>
+      <Content Include="Specification\ReconstituteState.feature" />
+      <Content Include="Specification\SaveEventStream.feature" />
+      <Content Include="Specification\StateRetreivalSpecs.feature" />
+      <Content Include="Specification\StreamNameRules.feature" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Specification\ReconstituteState.feature.cs">
+        <DependentUpon>ReconstituteState.feature</DependentUpon>
+      </Compile>
+      <Compile Update="Specification\SaveEventStream.feature.cs">
+        <DependentUpon>SaveEventStream.feature</DependentUpon>
+      </Compile>
+      <Compile Update="Specification\StateRetreivalSpecs.feature.cs">
+        <DependentUpon>StateRetreivalSpecs.feature</DependentUpon>
+      </Compile>
+    </ItemGroup>
 
 </Project>

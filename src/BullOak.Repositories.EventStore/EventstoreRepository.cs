@@ -21,10 +21,11 @@
 
         public async Task<IManageSessionOf<TState>> BeginSessionFor(TId id, bool throwIfNotExists = false)
         {
+            var streamName = GetStreamName(id);
             if (throwIfNotExists && !(await Contains(id)))
-                throw new StreamNotFoundException(id.ToString());
+                throw new StreamNotFoundException(streamName);
 
-            var session = new EventStoreSession<TState>(configs, connection, id.ToString());
+            var session = new EventStoreSession<TState>(configs, connection, streamName);
             await session.Initialize();
 
             return session;
@@ -34,7 +35,7 @@
         {
             try
             {
-                var id = selector.ToString();
+                var id = GetStreamName(selector);
                 var eventsTail = await connection.ReadStreamEventsForwardAsync(id, 0, 1, false);
                 return eventsTail.Status == SliceReadStatus.Success;
             }
@@ -46,10 +47,13 @@
 
         public async Task Delete(TId selector)
         {
-            var id = selector.ToString();
+            var id = GetStreamName(selector);
             var eventsTail = await connection.ReadStreamEventsBackwardAsync(id, 0, 1, false);
             var expectedVersion = eventsTail.LastEventNumber;
             await connection.DeleteStreamAsync(id, expectedVersion);
         }
+
+        private string GetStreamName(TId id) => 
+            id is ISerializeToStreamName serializable ? serializable.Serialize() : id.ToString();
     }
 }
