@@ -2,15 +2,15 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>  
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <AssemblyName>BullOak.Repositories.EventStore</AssemblyName>
     <PackageId>BullOak.Repositories.EventStore</PackageId>
+    <Title>BullOak.Repositories.EventStore</Title>
     <Description>The BullOak.Repositories implementation for EventStore</Description>
     <Summary>This is the EventStore implementation of a repository for BullOak.Repositories. See BullOak.Repositories nuget for more info.</Summary>
     <Authors>Savvas Kleanthous</Authors>
     <Company>BullOak</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/BullOak/BullOak</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/BullOak/BullOak</RepositoryUrl>
+    <RepositoryUrl>https://github.com/BullOak/BullOak.Repositories.EventStore</RepositoryUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/BullOak/BullOak/master/icons/Icon128.png</PackageIconUrl>
     <PackageTags>CQRS EventStourcing event-driven repository repositories DDD domain-driven-design</PackageTags>
     <Version>2.1.0</Version>
