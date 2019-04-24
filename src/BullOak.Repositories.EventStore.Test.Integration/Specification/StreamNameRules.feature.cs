@@ -17,17 +17,17 @@ namespace BullOak.Repositories.EventStore.Test.Integration.Specification
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.0.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class ReadModelSpecsFeature : Xunit.IClassFixture<ReadModelSpecsFeature.FixtureData>, System.IDisposable
+    public partial class StreamNameRulesFeature : Xunit.IClassFixture<StreamNameRulesFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
-#line 1 "ReadModelSpecs.feature"
+#line 1 "StreamNameRules.feature"
 #line hidden
         
-        public ReadModelSpecsFeature(ReadModelSpecsFeature.FixtureData fixtureData, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public StreamNameRulesFeature(StreamNameRulesFeature.FixtureData fixtureData, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -36,8 +36,8 @@ namespace BullOak.Repositories.EventStore.Test.Integration.Specification
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "ReadModelSpecs", "\tIn order to support read models\n\tAs a user of this library\n\tI want to be able to" +
-                    " load entities from readonly repositories", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "StreamNameRules", "  In order to correlate entity id with the stream name\n  As a library user\n  I ex" +
+                    "pect stream names to be generated based on the id provided", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -77,29 +77,40 @@ namespace BullOak.Repositories.EventStore.Test.Integration.Specification
             this.ScenarioTearDown();
         }
         
-        [Xunit.FactAttribute(DisplayName="Reconstitute state from one event stored using interface")]
-        [Xunit.TraitAttribute("FeatureTitle", "ReadModelSpecs")]
-        [Xunit.TraitAttribute("Description", "Reconstitute state from one event stored using interface")]
-        public virtual void ReconstituteStateFromOneEventStoredUsingInterface()
+        [Xunit.FactAttribute(DisplayName="Save events to a stream based on explicit interface")]
+        [Xunit.TraitAttribute("FeatureTitle", "StreamNameRules")]
+        [Xunit.TraitAttribute("Description", "Save events to a stream based on explicit interface")]
+        public virtual void SaveEventsToAStreamBasedOnExplicitInterface()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Reconstitute state from one event stored using interface", null, ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Save events to a stream based on explicit interface", null, ((string[])(null)));
 #line 6
-this.ScenarioInitialize(scenarioInfo);
+  this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line 7
- testRunner.Given("a new stream", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+    testRunner.Given("a new Id explicitly implementing ISerializeToStreamName", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 8
- testRunner.And("3 new events", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+    testRunner.When("I try to save the new events for that id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line 9
- testRunner.And("I try to save the new events in the stream through their interface", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 10
- testRunner.When("I load my entity through the read-only repository", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    testRunner.Then("the explicitly named event stream should exist and contain saved data", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.FactAttribute(DisplayName="Save events to a stream based on ToString")]
+        [Xunit.TraitAttribute("FeatureTitle", "StreamNameRules")]
+        [Xunit.TraitAttribute("Description", "Save events to a stream based on ToString")]
+        public virtual void SaveEventsToAStreamBasedOnToString()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Save events to a stream based on ToString", null, ((string[])(null)));
 #line 11
- testRunner.Then("the load process should succeed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+  this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
 #line 12
- testRunner.And("HighOrder property should be 2", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+    testRunner.Given("a new Id that doesn\'t implement ISerializeToStreamName", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 13
- testRunner.And("have a concurrency id of 2", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+    testRunner.When("I try to save the new events for that id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 14
+    testRunner.Then("the ToString based event stream should exist and contain saved data", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
@@ -111,12 +122,12 @@ this.ScenarioInitialize(scenarioInfo);
             
             public FixtureData()
             {
-                ReadModelSpecsFeature.FeatureSetup();
+                StreamNameRulesFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                ReadModelSpecsFeature.FeatureTearDown();
+                StreamNameRulesFeature.FeatureTearDown();
             }
         }
     }

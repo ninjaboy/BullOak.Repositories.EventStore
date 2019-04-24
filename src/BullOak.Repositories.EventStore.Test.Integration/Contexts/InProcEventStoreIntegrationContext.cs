@@ -15,42 +15,54 @@
     using Events;
     using TechTalk.SpecFlow;
 
-    internal class InProcEventStoreIntegrationContext
+    public class InProcEventStoreIntegrationContext
     {
         //private static ClusterVNode node;
-        private readonly EventStoreRepository<string, IHoldHigherOrder> repository;
+        private EventStoreRepository<string, IHoldHigherOrder> repository;
         public readonly EventStoreReadOnlyRepository<string, IHoldHigherOrder> readOnlyRepository;
         private static IEventStoreConnection connection;
         private static Process eventStoreProcess;
+        private static readonly Func<string, bool, string> settingsResolver = SettingsResolver.GetSettingsResolver();
+        private static bool startEventStoreServer;
 
         public InProcEventStoreIntegrationContext()
         {
-            var configuration = Configuration.Begin()
-               .WithDefaultCollection()
-               .WithDefaultStateFactory()
-               .NeverUseThreadSafe()
-               .WithNoEventPublisher()
-               .WithAnyAppliersFrom(Assembly.GetExecutingAssembly())
-               //.WithEventApplier(new StateApplier())
-               .AndNoMoreAppliers()
-               .WithNoUpconverters()
-               .Build();
+            var configuration = CreateConfigurationForBullOak();
 
             repository = new EventStoreRepository<string, IHoldHigherOrder>(configuration, GetConnection());
             readOnlyRepository = new EventStoreReadOnlyRepository<string, IHoldHigherOrder>(configuration, GetConnection());
         }
 
-        private static IEventStoreConnection GetConnection()
+        public static IHoldAllConfiguration CreateConfigurationForBullOak()
+        {
+            var configuration = Configuration.Begin()
+                .WithDefaultCollection()
+                .WithDefaultStateFactory()
+                .NeverUseThreadSafe()
+                .WithNoEventPublisher()
+                .WithAnyAppliersFrom(Assembly.GetExecutingAssembly())
+                //.WithEventApplier(new StateApplier())
+                .AndNoMoreAppliers()
+                .WithNoUpconverters()
+                .Build();
+            return configuration;
+        }
+
+        public static IEventStoreConnection GetConnection()
         {
             return connection;
         }
 
-        [BeforeTestRun]
         public static async Task SetupNode()
         {
+            startEventStoreServer = bool.Parse(settingsResolver("EventStore.StartServerInProcess", false));
+            var connectionString = settingsResolver("EventStore.ConnectionString", false);
             if (connection == null)
             {
-                RunEventStoreServerProcess();
+                if (startEventStoreServer)
+                {
+                    eventStoreProcess = EventStoreServerStarterHelper.StartServer();
+                }
 
                 var settings = ConnectionSettings
                     .Create()
@@ -59,22 +71,17 @@
                     .KeepRetrying()
                     .UseConsoleLogger();
 
-                var localhostConnectionString = "ConnectTo=tcp://localhost:1113; HeartBeatTimeout=500";
-
-                connection = EventStoreConnection.Create(localhostConnectionString, settings);
+                connection = EventStoreConnection.Create(connectionString, settings);
                 await connection.ConnectAsync();
             }
         }
 
-        private static void RunEventStoreServerProcess()
-        {
-            eventStoreProcess = EventStoreServerStarterHelper.StartServer();
-        }
-
-        [AfterTestRun]
         public static void TeardownNode()
         {
-            EventStoreServerStarterHelper.StopProcess(eventStoreProcess);
+            if (startEventStoreServer)
+            {
+                EventStoreServerStarterHelper.StopProcess(eventStoreProcess);
+            }
         }
 
         public async Task<IManageSessionOf<IHoldHigherOrder>> StartSession(Guid currentStreamId)
@@ -106,7 +113,12 @@
             where TSoftDeleteEvent : EntitySoftDeleted
             => repository.SoftDeleteByEvent(id.ToString(), createSoftDeleteEvent);
 
-        public async Task<ResolvedEvent[]> ReadEventsFromStreamRaw(Guid id)
+        public Task<ResolvedEvent[]> ReadEventsFromStreamRaw(Guid id)
+        {
+            return ReadEventsFromStreamRaw(id.ToString());
+        }
+
+        public async Task<ResolvedEvent[]> ReadEventsFromStreamRaw(string streamName)
         {
             var conn = GetConnection();
             var result = new List<ResolvedEvent>();
@@ -114,7 +126,7 @@
             long nextSliceStart = StreamPosition.Start;
             do
             {
-                currentSlice = await conn.ReadStreamEventsForwardAsync(id.ToString(), nextSliceStart, 100, false);
+                currentSlice = await conn.ReadStreamEventsForwardAsync(streamName, nextSliceStart, 100, false);
                 nextSliceStart = currentSlice.NextEventNumber;
                 result.AddRange(currentSlice.Events);
             } while (!currentSlice.IsEndOfStream);
